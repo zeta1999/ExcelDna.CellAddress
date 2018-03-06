@@ -40,20 +40,31 @@ namespace ExcelDna.Extensions{
             return range.GetValue().ConvertTo<T>();
         }
 
-        public static IEnumerable<T> GetValues<T>(this ExcelReference range)
-        {
-            return range.Cells().Select(c => c.GetValue()).OfType<T>();
+        /// <summary>
+        /// 获取单元格数值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetValues<T>(this ExcelReference range){
+            if (range.CellsCount() == 1) {
+                return new T[]{ range.GetValue().ConvertTo<T>()};
+            }
+            return ((object[,]) range.GetValue()).AsIEnumerable<T>();
         }
 
+/*
         public static IEnumerable<T> GetValues<T>(this IEnumerable<ExcelReference> ranges)
         {
             return ranges.Cells().Select(c => c.GetValue()).OfType<T>();
         }
+*/
 
         private static bool IsSingleCell(this ExcelReference reference) {
             return reference.ColumnFirst == reference.ColumnLast && reference.RowFirst == reference.RowLast;
         }
 
+/*
         /// <summary>
         ///     单元格范围地址
         /// </summary>
@@ -70,7 +81,9 @@ namespace ExcelDna.Extensions{
 
             //return string.Join(",", range.InnerReferences.Select(r => r.Address()));
         }
+*/
 
+/*
         /// <summary>
         ///     ExcelReference 本地地址 (不包括 Worksheet 名称)
         /// </summary>
@@ -83,7 +96,9 @@ namespace ExcelDna.Extensions{
                 return
                     $"${range.ColumnFirst.ColumnName()}${range.RowFirst + 1}:${range.ColumnLast.ColumnName()}${range.RowLast + 1}";
         }
+*/
 
+/*
         /// <summary>
         ///     根据 列索引 计算列名 0=>A  1=>B
         ///     从 0 开始计算
@@ -114,6 +129,7 @@ namespace ExcelDna.Extensions{
             }
             throw new ArgumentException("超出列名范围");
         }
+*/
 
 
         /// <summary>
@@ -124,6 +140,7 @@ namespace ExcelDna.Extensions{
             XlCall.Excel(XlCall.xlcSelect, reference);
         }
 
+/*
         /// <summary>
         /// 选中单元格
         /// </summary>
@@ -132,19 +149,25 @@ namespace ExcelDna.Extensions{
             XlCall.Excel(XlCall.xlcFormulaGoto, range);
             XlCall.Excel(XlCall.xlcSelect, range, Type.Missing);
         }
+*/
 
+/*
         public static void Copy(this ExcelReference fromRange, ExcelReference toRange = null){
             object to_range = (toRange == null) ? Type.Missing : toRange;
             XlCall.Excel(XlCall.xlcCopy, fromRange, to_range);
         }
+*/
 
+/*
         public static ExcelReference Resize(this ExcelReference range, int rows, int cols){
             rows = (rows < 1) ? 1 : rows;
             cols = (cols < 1) ? 1 : cols;
             return new ExcelReference(range.RowFirst, range.RowFirst + rows - 1, range.ColumnFirst,
                 range.ColumnFirst + cols - 1, range.SheetId);
         }
+*/
 
+/*
         /// <summary>
         ///     从当前单元格计算偏移范围，返回和原始单元格相同大小的 ExcelReference 对象
         /// </summary>
@@ -156,7 +179,9 @@ namespace ExcelDna.Extensions{
             return new ExcelReference(range.RowFirst + rows, range.RowLast + rows, range.ColumnFirst + cols,
                 range.ColumnLast + cols, range.SheetId);
         }
+*/
 
+/*
         /// <summary>
         ///     返回从当前单元格 左上角开始计算的 范围，根据给定的行列值，返回一个 rows*cols 大小的单元格区间
         /// </summary>
@@ -178,7 +203,9 @@ namespace ExcelDna.Extensions{
             return new ExcelReference(range.RowFirst, range.RowFirst + rows, range.ColumnFirst,
                 range.ColumnFirst + cols, range.SheetId);
         }
+*/
 
+/*
         /// <summary>
         ///     根据给定参考范围，返回给定单元格相关的地址范围
         ///     如果 <see cref="address">单元格地址</see>包括工作簿，则使用地址的工作簿
@@ -213,6 +240,7 @@ namespace ExcelDna.Extensions{
                 }
             }
         }
+*/
 
         public static int CellsCount(this ExcelReference range) {
             return range.Rows()*range.Columns();
@@ -290,6 +318,7 @@ namespace ExcelDna.Extensions{
             return string.IsNullOrEmpty(value.ToString());
         }
 
+/*
         /// <summary>
         ///     向单元格赋值,横向 单行，多列 [n,0]
         /// </summary>
@@ -308,7 +337,9 @@ namespace ExcelDna.Extensions{
                 colRange.SetValue(array);
             }
         }
+*/
 
+/*
         /// <summary>
         ///     向单元格赋值,横向 单行，多列 [n,0]
         /// </summary>
@@ -326,7 +357,9 @@ namespace ExcelDna.Extensions{
                 colRange.SetValue(values);
             }
         }
+*/
 
+/*
         /// <summary>
         ///     描述 <see cref="cell" /> 单元格是否包含在<see cref="range" /> 范围内
         /// </summary>
@@ -345,6 +378,7 @@ namespace ExcelDna.Extensions{
                    && range.ColumnLast >= cell.ColumnLast
                    && range.ColumnFirst <= cell.ColumnFirst;
         }
+*/
 
         #region 基本属性
 

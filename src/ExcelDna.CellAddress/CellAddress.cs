@@ -182,26 +182,27 @@ namespace ExcelDna {
             get { return _cellReference != null; }
         }
 
+
+
+        #endregion
+
+        #region  public methods
         /// <summary>
         /// 单元格COM对象 引用
         /// </summary>
-        internal Range CellRange {
+        public Range CellRange {
             get {
                 if (_cellRange == null || !Marshal.IsComObject(_cellRange)) {
-                    _cellRange = ExcelApp.Return(a => a.Range[ToString()]);
+                    _cellRange = this.GetRangeImpl();
                 }
                 return _cellRange;
             }
         }
 
-        #endregion
-
-        #region  public methods
-
         /// <summary>
         ///     单元格引用<see cref="ExcelReference" />
         /// </summary>
-        internal ExcelReference CellReference {
+        public ExcelReference CellReference {
             get {
                 if (_cellReference == null) {
                     try {
@@ -210,7 +211,7 @@ namespace ExcelDna {
                         _cellReference = new ExcelReference(RowFirst, RowLast, ColumnFirst, ColumnLast);
                         SheetName = _cellReference.SheetNameLocal();
                     }
-                    Debug.Print($"CellAddress {LocalAddress} SheetId:{_cellReference.SheetId}");
+                    Trace.TraceInformation($"CellAddress {LocalAddress} SheetId:{_cellReference.SheetId}");
                 }
                 return _cellReference;
             }
@@ -225,6 +226,23 @@ namespace ExcelDna {
             return AddressParser.ParseAddress(rangeAddress);
         }
 
+        #region Methods
+
+        private Range GetRangeImpl() {
+            try {
+                var xlApp = ExcelDnaUtil.Application;
+                if (!(xlApp is Application application)) {
+                    throw new NullReferenceException();
+                }
+                return application.Range[this.FullAddress];
+            } catch (InvalidOperationException ioe) {
+                //当前 ExcelApplication 不可用
+                Trace.TraceWarning("GetRange Error {0}", ioe);
+                throw;
+            }
+        }
+
+        #endregion
 
 
         #region Equality members
@@ -507,7 +525,7 @@ namespace ExcelDna {
                 if (rowIndex < 0 || columnIndex < 0) {
                     return ErrorReference;
                 }
-                return $"${GetColumnName(columnIndex)}${rowIndex + 1}";
+                return $"{GetColumnName(columnIndex)}{rowIndex + 1}";
             }
 
             /// <summary>

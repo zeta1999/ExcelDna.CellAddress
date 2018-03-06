@@ -9,6 +9,7 @@ namespace ExcelDna.Extensions {
     ///     Excel Range 扩展方法
     /// </summary>
     public static class RangeExtensions {
+/*
         /// <summary>
         ///     <see cref="Range">Range</see>对象转换为 单一<see cref="ExcelReference" />
         /// </summary>
@@ -19,7 +20,9 @@ namespace ExcelDna.Extensions {
             var col = cell.Column - 1;
             return new ExcelReference(row, row, col, col, cell.Worksheet.Name);
         }
+*/
 
+/*
         /// <summary>
         ///    判断单元格是否为空
         /// </summary>
@@ -43,7 +46,9 @@ namespace ExcelDna.Extensions {
             object value = range.Value2;
             return value.IsEmpty();
         }
+*/
 
+/*
         private static bool IsEmpty(this object value) {
             if (value == null || value is DBNull || value is ExcelEmpty || value is ExcelError ||
                 value is ExcelMissing
@@ -52,7 +57,9 @@ namespace ExcelDna.Extensions {
             }
             return string.IsNullOrEmpty(value.ToString());
         }
+*/
 
+/*
         /// <summary>
         ///     获取下一行单元格,包括合并单元格
         /// </summary>
@@ -64,20 +71,24 @@ namespace ExcelDna.Extensions {
             }
             return cell.Next[2, 0] as Range;
         }
+*/
 
 
         #region AsIEnumerable
 
+/*
         public static IEnumerable<Range> AsEnumerable(this Areas areas) {
             foreach (Range area in areas) {
                 yield return area;
             }
         } 
+*/
 
         #endregion
 
         #region GetCells
 
+/*
         /// <summary>
         ///     返回 <see cref="Microsoft.Office.Interop.Excel.Range" /> 对象中单元格的集合
         ///     按照列优先的顺序返回，支持 合并单元格检测
@@ -102,7 +113,9 @@ namespace ExcelDna.Extensions {
                 }
             }
         }
+*/
 
+/*
         /// <summary>
         ///     返回 <see cref="Microsoft.Office.Interop.Excel.Range" /> 对象中单元格的集合
         ///     按照列优先的顺序返回，支持 合并单元格检测
@@ -140,7 +153,9 @@ namespace ExcelDna.Extensions {
                 }
             }
         }
+*/
 
+/*
         /// <summary>
         ///     列区域，遍历各个区域的 每个列
         /// </summary>
@@ -164,11 +179,13 @@ namespace ExcelDna.Extensions {
                 }
             }
         }
+*/
 
         #endregion GetCells
 
         #region GetFormula
 
+/*
         /// <summary>
         ///     设置 单元格公式
         /// </summary>
@@ -186,7 +203,9 @@ namespace ExcelDna.Extensions {
             range.Formula = formula;
             range.FormulaHidden = true;
         }
+*/
 
+/*
         /// <summary>
         ///     设置 单元格公式
         /// </summary>
@@ -203,11 +222,13 @@ namespace ExcelDna.Extensions {
             range.Formula = formula;
             range.FormulaHidden = true;
         }
+*/
 
         #endregion GetFormula
 
         #region Range Address
 
+/*
         /// <summary>
         ///     获取 <see cref="Range">单元格区域</see>地址
         ///     通过 ‘,’ 分隔多个区域地质
@@ -217,31 +238,16 @@ namespace ExcelDna.Extensions {
         public static string FullAddress(this Range range) {
             return string.Join(",", range.GetAddress());
         }
+*/
 
+/*
         private static IEnumerable<string> GetAddress(this Range range) {
             foreach (Range area in range.Areas) {
                 yield return $"{range.Worksheet.Name}!{area.Address}";
             }
         }
+*/
 
         #endregion Range Address
-
-        #region ListObjects
-
-        public static IEnumerable<ListObject> OfType(this ListObjects listObjects) {
-            foreach (ListObject listObject in listObjects) {
-                yield return listObject;
-            }
-        }
-
-        public static bool Contains(this ListObjects listObjects, string name) {
-            return listObjects.OfType().Any(l => l.Name == name);
-        }
-
-        public static ListObject FirstOrDefault(this ListObjects listObjects, string name) {
-            return listObjects.OfType().FirstOrDefault(l => l.Name == name);
-        }
-
-        #endregion ListObjects
     }
 }

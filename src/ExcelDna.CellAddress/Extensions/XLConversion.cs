@@ -27,18 +27,17 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using ExcelDna.Integration;
-using RedRiver.ExcelDNA.Extensions;
 
 namespace ExcelDna.Extensions{
     public static class XlConversion{
         #region object conversion
 
         //a thread-safe way to hold default instances created at run-time
-        private static readonly ConcurrentDictionary<Type, object> typeDefaults =
+        private static readonly ConcurrentDictionary<Type, object> TypeDefaults =
             new ConcurrentDictionary<Type, object>();
 
         private static object GetDefault(Type type){
-            return type.IsValueType ? typeDefaults.GetOrAdd(type, t => Activator.CreateInstance(t)) : null;
+            return type.IsValueType ? TypeDefaults.GetOrAdd(type, Activator.CreateInstance) : null;
         }
 
         public static object ConvertTo(this object vt, Type toType){
@@ -136,12 +135,12 @@ namespace ExcelDna.Extensions{
             if (instance.IsNull()){
                 return true;
             }
-            var array = instance as Array;
-            if (array != null && array.Length == 0){
+
+            if (instance is Array array && array.Length == 0){
                 return true;
             }
-            var str = instance as string;
-            if (str != null){
+
+            if (instance is string str){
                 return string.IsNullOrEmpty(str);
             }
             return false;
@@ -177,8 +176,7 @@ namespace ExcelDna.Extensions{
                 } else if (fromType == typeof (double)){
                     dt = DateTime.FromOADate((double) vt);
                 } else if (fromType == typeof (string)){
-                    DateTime result;
-                    if (DateTime.TryParse((string) vt, out result)){
+                    if (DateTime.TryParse((string) vt, out var result)){
                         dt = result;
                     }
                 }
@@ -192,8 +190,7 @@ namespace ExcelDna.Extensions{
                 } else if (fromType == typeof (double)){
                     dt = (double) vt;
                 } else if (fromType == typeof (string)){
-                    DateTime result;
-                    if (DateTime.TryParse((string) vt, out result)){
+                    if (DateTime.TryParse((string) vt, out var result)){
                         dt = result;
                     } else{
                         dt = 0.0;

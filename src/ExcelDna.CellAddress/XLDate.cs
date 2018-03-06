@@ -24,7 +24,7 @@ SOFTWARE.
 
 using System;
 
-namespace RedRiver.ExcelDNA.Extensions{
+namespace ExcelDna{
     /// <summary>
     ///     Convenience struct to work directly with Excel double dates rather than using DateTime.FromOADate() conversions
     ///     for certain calculations there exist a direct and fast operation without going through all the conversions

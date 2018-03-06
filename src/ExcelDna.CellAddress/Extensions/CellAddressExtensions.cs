@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ExcelDna.Integration;
+using Microsoft.Office.Interop.Excel;
 
 namespace ExcelDna.Extensions {
     public static class CellAddressExtensions {
@@ -21,13 +23,13 @@ namespace ExcelDna.Extensions {
             }
             if (direction == XlFillDirection.ColumnFirst) {
                 //列优先
-                return range.GetCell(index % range.Rows,index / range.Rows);
+                return range.GetCell(index % range.Rows, index / range.Rows);
             }
             return range.GetCell(index % range.Columns, index / range.Columns);
         }
 
         public static CellAddress GetCell(this CellAddress cell, int rowIndex = 0, int columnIndex = 0) {
-            return new CellAddress(cell.SheetName,cell.RowFirst + rowIndex,cell.ColumnFirst + columnIndex);
+            return new CellAddress(cell.SheetName, cell.RowFirst + rowIndex, cell.ColumnFirst + columnIndex);
         }
 
         /// <summary>
@@ -126,8 +128,7 @@ namespace ExcelDna.Extensions {
                 vt[0, 0] = value;
                 cell.SetValueInternal(vt);
             } else {
-                var array = value as object[,];
-                if (array != null) {
+                if (value is object[,] array) {
                     cell.SetValueInternal(array);
                 } else if (value is string) {
                     var str = (string)value;
@@ -173,6 +174,20 @@ namespace ExcelDna.Extensions {
             cell?.CellReference.Activate();
         }
 
+        internal static Range GetRange(this string celladdress) {
+            try {
+                var xlApp = ExcelDnaUtil.Application;
+                if (!(xlApp is Application application)) {
+                    throw new NullReferenceException();
+                }
+                return application.Range[celladdress];
+            } catch (InvalidOperationException ioe) {
+                //当前 ExcelApplication 不可用
+                Trace.TraceWarning("GetRange Error {0}", ioe);
+                throw ioe;
+            }
+        }
+
         internal static CellAddress GetRange(this IEnumerable<CellAddress> cells) {
             if (cells == null) {
                 return CellAddress.Ref;
@@ -192,7 +207,7 @@ namespace ExcelDna.Extensions {
             var colFirst = cellArray.Min(c => c.ColumnFirst);
             var colLast = cellArray.Max(c => c.ColumnLast);
 
-            return new CellAddress(sheet,rowFirst,rowLast,colFirst,colLast);
+            return new CellAddress(sheet, rowFirst, rowLast, colFirst, colLast);
         }
     }
 }
