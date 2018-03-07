@@ -35,7 +35,7 @@ namespace ExcelDna {
                 try {
                     Marshal.FinalReleaseComObject(_cellRange);
                 } catch (InvalidComObjectException ex) {
-                    Trace.TraceWarning("Final CellAddress error," + ex.Message);
+                    Trace.TraceWarning("Final CellAddress error,{0}",ex.Message);
                 } finally {
                     _cellRange = null;
                 }
@@ -50,16 +50,19 @@ namespace ExcelDna {
         public CellAddress(ExcelReference reference) : this(reference.SheetNameLocal(),
             reference.RowFirst,reference.RowLast,reference.ColumnFirst,reference.ColumnLast) {
             if (reference.InnerReferences.Count > 1) {
-                throw new Exception("CellAddress 只能包括一个区域");
+                throw new ArgumentException("CellAddress 只能包括一个区域");
             }
-            this._cellReference = reference;
+            _cellReference = reference;
         }
 
         public CellAddress(Range range) {
             _cellRange = range ?? throw new ArgumentNullException(nameof(range));
+            if (range.Areas.Count > 1) {
+                throw new ArgumentException("Range 只能包括一个区域");
+            }
             SheetName = range.Worksheet.Name;
             LocalAddress = range.Address;
-            //_hashCode = SheetName.GetHashCode() ^ LocalAddress.GetHashCode();
+            
             Count = range.Count;
             if (Count == 1) {
                 RowFirst = RowLast = range.Row - 1;
@@ -193,7 +196,7 @@ namespace ExcelDna {
         public Range CellRange {
             get {
                 if (_cellRange == null || !Marshal.IsComObject(_cellRange)) {
-                    _cellRange = this.GetRangeImpl();
+                    _cellRange = GetRangeImpl();
                 }
                 return _cellRange;
             }
@@ -234,7 +237,7 @@ namespace ExcelDna {
                 if (!(xlApp is Application application)) {
                     throw new NullReferenceException();
                 }
-                return application.Range[this.FullAddress];
+                return application.Range[FullAddress];
             } catch (InvalidOperationException ioe) {
                 //当前 ExcelApplication 不可用
                 Trace.TraceWarning("GetRange Error {0}", ioe);
@@ -392,11 +395,10 @@ namespace ExcelDna {
                     }
                 } else {
                     //单元格范围
-                    int lastRow, lastCol;
                     if (GetRowColForA1(a1, addressStartIndex, a1.Length - splitIndex, out firstRow,
                             out firstCol) &&
-                        GetRowColForA1(a1, splitIndex, a1.Length - splitIndex, out lastRow,
-                            out lastCol)) {
+                        GetRowColForA1(a1, splitIndex, a1.Length - splitIndex, out var lastRow,
+                            out var lastCol)) {
                         return new CellAddress(sheetName, firstRow - 1, lastRow - 1, firstCol - 1, lastCol - 1);
                     }
                 }
@@ -547,14 +549,14 @@ namespace ExcelDna {
                 if (colNum < 702) {
                     c1 = colNum / columnsBound - 1;
                     c2 = colNum % columnsBound;
-                    return new string(new char[] { (char)('A' + c1), (char)('A' + c2) });
+                    return new string(new[] { (char)('A' + c1), (char)('A' + c2) });
                 }
 
                 c1 = colNum / (columnsBound * columnsBound) - 1;
                 c2 = (colNum % (columnsBound * columnsBound)) / columnsBound - 1;
                 var c3 = colNum % columnsBound;
 
-                return new string(new char[] { (char)('A' + c1), (char)('A' + c2), (char)('A' + c3) });
+                return new string(new[] { (char)('A' + c1), (char)('A' + c2), (char)('A' + c3) });
             }
         }
 

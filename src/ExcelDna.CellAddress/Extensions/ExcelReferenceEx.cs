@@ -452,8 +452,8 @@ namespace ExcelDna.Extensions{
                 formulaR1C1 = (string)
                     XlCall.Excel(XlCall.xlfFormulaConvert, formula, true, false, ExcelMissing.Value, range);
             }
-            object ignoredResult;
-            XlCall.XlReturn retval = XlCall.TryExcel(XlCall.xlcFormula, out ignoredResult, formulaR1C1, range);
+
+            XlCall.XlReturn retval = XlCall.TryExcel(XlCall.xlcFormula, out var ignoredResult, formulaR1C1, range);
             if (retval != XlCall.XlReturn.XlReturnSuccess){
                 // TODO: Consider what to do now!?
                 // Might have failed due to array in the way.

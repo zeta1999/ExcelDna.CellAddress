@@ -25,7 +25,7 @@ namespace ExcelDna.Extensions {
                 //列优先
                 return range.GetCell(index % range.Rows, index / range.Rows);
             }
-            return range.GetCell(index % range.Columns, index / range.Columns);
+            return range.GetCell(index / range.Columns,index % range.Columns);
         }
 
         public static CellAddress GetCell(this CellAddress cell, int rowIndex = 0, int columnIndex = 0) {
@@ -139,14 +139,15 @@ namespace ExcelDna.Extensions {
             }
         }
 
-        private static void SetValueInternal(this CellAddress cell, object[,] value) {
-            var reference = cell.CellReference;
+        private static void SetValueInternal(this CellAddress cell, object[,] value) {            
             try {
-                if (reference != null) {
+                cell.CellReference.SetValue(value);
+                /*    if (reference != null) {
                     reference.SetValue(value);
                 } else {
                     cell.CellRange.Value2 = value;
                 }
+                */
             } catch (XlCallException) {
                 throw new Exception($"{cell}单元格定义错误,无法写入该单元格");
             }
@@ -161,15 +162,41 @@ namespace ExcelDna.Extensions {
             cell.CellReference.SetFormula(formula);
         }
 
+        /// <summary>
+        /// 清理内容
+        /// </summary>
+        /// <remarks>
+        /// CLEAR (Macro Sheets Only)
+        /// Equivalent to choosing the Clear command from the Edit menu.Clears contents, formats, notes, or all of these from the active worksheet or macro sheet.Clears series or formats from the active chart.
+        /// Syntax 
+        /// CLEAR(type_num)
+        /// CLEAR?(type_num)
+        /// Type_num    is a number from 1 to 4 specifying what to clear. Only values 1, 2, and 3 are valid if the selected item is a chart.
+        /// On a worksheet or macro sheet, or if an entire chart is selected, the following occurs.
+        /// Type_num    Clears
+        /// - 1     All
+        /// - 2     Formats(if a chart, clears the chart format or clears pictures)
+        /// - 3     Contents(if a chart, clears all data series)
+        /// - 4     Comments(this does not apply to charts)
+        /// </remarks>
+        /// <param name="cell"></param>
         public static void ClearContents(this CellAddress cell) {
             if (cell == null) {
                 throw new ArgumentNullException(nameof(cell));
             }
+
+            //XlCall.Excel(XlCall.xlcClear, cell.CellReference, 3);
+            //cell.CellReference.SetValue(ExcelMissing.Value);
+            //cell.CellReference.ClearFormula();
             cell.CellRange.ClearContents();
         }
 
         #endregion
 
+        /// <summary>
+        /// 激活单元格
+        /// </summary>
+        /// <param name="cell"></param>
         public static void Activate(this CellAddress cell) {
             cell?.CellReference.Activate();
         }
@@ -184,7 +211,7 @@ namespace ExcelDna.Extensions {
             } catch (InvalidOperationException ioe) {
                 //当前 ExcelApplication 不可用
                 Trace.TraceWarning("GetRange Error {0}", ioe);
-                throw ioe;
+                throw;
             }
         }
 

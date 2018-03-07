@@ -4,7 +4,9 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelDna.CellAddress", "src\ExcelDna.CellAddress\ExcelDna.CellAddress.csproj", "{83F84764-54EB-4B6C-8E1E-302EC42F83D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelDna.CellAddress.Tests", "test\ExcelDna.CellAddress.Tests\ExcelDna.CellAddress.Tests.csproj", "{8C32761F-23B7-457A-80E1-7EE981E71CFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelDna.CellAddress.Tests", "test\ExcelDna.CellAddress.Tests\ExcelDna.CellAddress.Tests.csproj", "{8C32761F-23B7-457A-80E1-7EE981E71CFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CellAddress.Tests.AddIn", "test\CellAddress.Tests.AddIn\CellAddress.Tests.AddIn.csproj", "{E4CBBE63-5DD2-4B2A-A1AE-5CCBFA5B055C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{8C32761F-23B7-457A-80E1-7EE981E71CFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C32761F-23B7-457A-80E1-7EE981E71CFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C32761F-23B7-457A-80E1-7EE981E71CFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4CBBE63-5DD2-4B2A-A1AE-5CCBFA5B055C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4CBBE63-5DD2-4B2A-A1AE-5CCBFA5B055C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4CBBE63-5DD2-4B2A-A1AE-5CCBFA5B055C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4CBBE63-5DD2-4B2A-A1AE-5CCBFA5B055C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
