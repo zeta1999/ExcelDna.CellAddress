@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="ExcelDna.Integration" Version="0.34.6" />
-    <PackageReference Include="ExcelDna.Interop" Version="14.0.1" />
+    <PackageReference Include="Microsoft.Office.Interop.Excel" Version="12.0.0" />
   </ItemGroup>
 
 </Project>

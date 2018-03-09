@@ -305,7 +305,6 @@ namespace ExcelDna {
 
         #region implicit
 
-        //[CLSCompliant(false)]
         public static implicit operator CellAddress(string address) {
             if (string.IsNullOrEmpty(address)) {
                 return null;
@@ -321,10 +320,7 @@ namespace ExcelDna {
         }
 
         public static implicit operator ExcelReference(CellAddress address) {
-            if (address == null) {
-                return null;
-            }
-            return address.CellReference;
+            return address?.CellReference;
         }
 
         /// <summary>

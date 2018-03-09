@@ -137,19 +137,18 @@ namespace ExcelDna.Extensions{
         /// </summary>
         /// <param name="reference"></param>
         public static void Activate(this ExcelReference reference) {
-            XlCall.Excel(XlCall.xlcSelect, reference);
+            XlCall.Excel(XlCall.xlcFormulaGoto, reference);
+            XlCall.Excel(XlCall.xlcSelect, reference, Type.Missing);
         }
 
-/*
         /// <summary>
         /// 选中单元格
         /// </summary>
-        /// <param name="range"></param>
-        public static void Select(this ExcelReference range){
-            XlCall.Excel(XlCall.xlcFormulaGoto, range);
-            XlCall.Excel(XlCall.xlcSelect, range, Type.Missing);
+        /// <param name="reference"></param>
+        public static void Select(this ExcelReference reference){
+            XlCall.Excel(XlCall.xlcFormulaGoto, reference);
+            XlCall.Excel(XlCall.xlcSelect, reference, Type.Missing);
         }
-*/
 
 /*
         public static void Copy(this ExcelReference fromRange, ExcelReference toRange = null){

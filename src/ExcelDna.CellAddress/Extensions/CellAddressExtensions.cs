@@ -33,6 +33,20 @@ namespace ExcelDna.Extensions {
         }
 
         /// <summary>
+        /// 获取单元格序列
+        /// </summary>
+        /// <param name="cellRange"></param>
+        /// <param name="direction">遍历方向</param>
+        /// <returns></returns>
+        public static IEnumerable<CellAddress> GetCells(this CellAddress cellRange, XlFillDirection direction = XlFillDirection.RowFirst) {
+            if (cellRange!= CellAddress.Ref) {
+                for (var i = 0; i < cellRange.Count; i++) {
+                    yield return cellRange.GetCell(i, direction);
+                }
+            }
+        }
+
+        /// <summary>
         /// 返回 <see cref="CellAddress"/> 对象，它代表位于指定单元格区域的一定的偏移量位置上的区域。
         /// 返回的区域和原始区域大小相同
         /// <remarks>
@@ -56,7 +70,7 @@ namespace ExcelDna.Extensions {
         }
 
         /// <summary>
-        /// 单元格地址最大的一个
+        /// 单元格 开始位置 <b>右下方</b>的一个
         /// </summary>
         /// <param name="cell1"></param>
         /// <param name="cell2"></param>
@@ -68,9 +82,9 @@ namespace ExcelDna.Extensions {
                 return cell2;
             }
         }
-
+        
         /// <summary>
-        /// 单元格地址 最小的一个
+        /// 单元格 开始位置<b>左上方</b> 的一个
         /// </summary>
         /// <param name="cell1"></param>
         /// <param name="cell2"></param>
@@ -142,12 +156,6 @@ namespace ExcelDna.Extensions {
         private static void SetValueInternal(this CellAddress cell, object[,] value) {            
             try {
                 cell.CellReference.SetValue(value);
-                /*    if (reference != null) {
-                    reference.SetValue(value);
-                } else {
-                    cell.CellRange.Value2 = value;
-                }
-                */
             } catch (XlCallException) {
                 throw new Exception($"{cell}单元格定义错误,无法写入该单元格");
             }
@@ -184,11 +192,7 @@ namespace ExcelDna.Extensions {
             if (cell == null) {
                 throw new ArgumentNullException(nameof(cell));
             }
-
-            //XlCall.Excel(XlCall.xlcClear, cell.CellReference, 3);
-            //cell.CellReference.SetValue(ExcelMissing.Value);
-            //cell.CellReference.ClearFormula();
-            cell.CellRange.ClearContents();
+            cell.CellReference.SetValue(ExcelEmpty.Value);
         }
 
         #endregion
@@ -215,7 +219,7 @@ namespace ExcelDna.Extensions {
             }
         }
 
-        internal static CellAddress GetRange(this IEnumerable<CellAddress> cells) {
+        public static CellAddress GetRange(this IEnumerable<CellAddress> cells) {
             if (cells == null) {
                 return CellAddress.Ref;
             }
@@ -225,7 +229,7 @@ namespace ExcelDna.Extensions {
                 return CellAddress.Ref;
             }
             if (cellArray.Length == 1) {
-                return cellArray[0];
+                return cellArray.First();
             }
 
             var sheet = cellArray.Select(c => c.SheetName).FirstOrDefault();
