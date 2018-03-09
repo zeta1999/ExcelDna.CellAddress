@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\RangeExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ExcelDna.Integration" Version="0.34.6" />
     <PackageReference Include="Microsoft.Office.Interop.Excel" Version="12.0.0" />
   </ItemGroup>

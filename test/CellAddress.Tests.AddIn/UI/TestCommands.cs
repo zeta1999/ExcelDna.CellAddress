@@ -14,15 +14,6 @@ namespace CellAddressTests.AddIn {
     public static class CellAddRressExtensionsTests {
         private const string UnitTestMenuName = "测试 CellAddress ";
 
-        [ExcelCommand(Description = "测试...", MenuName = UnitTestMenuName, MenuText = "测试 增加 CustomXMLParts 部件")]
-        public static void TestClearContents() {
-            try {
-                new CellAddressExtensionsTests().TestClearContents();
-            } catch (Exception ex) {
-                MessageBox.Show(ex.ToString());
-            }
-        }
-
         [ExcelCommand(Description = "测试全部", MenuName = UnitTestMenuName, MenuText = "测试全部")]
         public static void TestAll() {
             var provider = new UnitTestProvider();

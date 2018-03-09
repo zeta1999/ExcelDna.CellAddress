@@ -2,6 +2,7 @@
 using System.Linq;
 using ExcelDna;
 using ExcelDna.Extensions;
+using ExcelDna.Integration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CellAddressTests.AddIn {
@@ -64,12 +65,19 @@ namespace CellAddressTests.AddIn {
         [TestMethod]
         public void TestSetFormula() {
             var value = "Test Formula";
-            var c1 = CellAddress.Parse("A1");
-            c1.SetValue(value);
+            CellAddress.Parse("A1").SetValue(value);
 
-            var c2 = CellAddress.Parse("A2");
+            var c2 = CellAddress.Parse("B1");
             c2.SetFormula("=A1");
+
             Assert.AreEqual(value, c2.GetValue<string>());
+
+            ((CellAddress)"A2").SetValue(value);
+
+            var cells = ((CellAddress) "B1:B2");
+            cells.SetFormula("=A1");
+
+            Assert.IsTrue(cells.GetCells().All(c => c.GetFormula()=="=A1"));
         }
 
         [TestMethod]
@@ -80,4 +88,32 @@ namespace CellAddressTests.AddIn {
             Assert.AreEqual("A1:F5", cells.GetRange().LocalAddress);
         }
     }
+    /*
+    [TestClass]
+    public class ExcelReferenceExTests {
+
+        [TestMethod]
+        public void TestClearFormula() {
+            ((CellAddress)"A1").SetValue("TEST Clear Formula 1#");
+            ((CellAddress)"A2").SetValue("TEST Clear Formula 1#");
+
+            var c1 = CellAddress.Parse("B1");
+            c1.SetFormula("=A1");
+
+            var c2 = CellAddress.Parse("B2");
+            c2.SetFormula("=A2");
+
+            var range = CellAddress.Parse("B1:B2");
+            Assert.IsTrue(range.GetCells().All(c=>c.CellReference.HasFormula()));
+
+            //XlCall.Excel(XlCall.xlcFormula, string.Empty, range);
+            range.CellReference.ClearFormula();
+
+            Assert.IsTrue(range.GetCells().All(c => !c.CellReference.HasFormula()));
+
+            range.SetFormula("=A1");
+            Assert.IsTrue(range.GetCells().All(c => c.CellReference.HasFormula()));
+        }
+    }
+    */
 }

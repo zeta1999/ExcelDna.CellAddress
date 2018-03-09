@@ -82,7 +82,16 @@ namespace ExcelDna.Extensions {
                 return cell2;
             }
         }
-        
+
+        /// <summary>
+        /// 单元格 开始位置 <b>右下方</b>的一个
+        /// </summary>
+        /// <param name="cells"></param>
+        /// <returns></returns>
+        public static CellAddress Max(this IEnumerable<CellAddress> cells) {
+            return cells.OrderByDescending(c => c.ColumnFirst + c.RowFirst).FirstOrDefault();
+        }
+
         /// <summary>
         /// 单元格 开始位置<b>左上方</b> 的一个
         /// </summary>
@@ -97,6 +106,14 @@ namespace ExcelDna.Extensions {
             }
         }
 
+        /// <summary>
+        /// 单元格 开始位置<b>左上方</b> 的一个
+        /// </summary>
+        /// <param name="cells"></param>
+        /// <returns></returns>
+        public static CellAddress Min(this IEnumerable<CellAddress> cells) {
+            return cells.OrderBy(c => c.ColumnFirst + c.RowFirst).FirstOrDefault();
+        }
 
         #region CellAddress Values
         /// <summary>
@@ -167,7 +184,32 @@ namespace ExcelDna.Extensions {
         /// <param name="cell"></param>
         /// <param name="formula"></param>
         public static void SetFormula(this CellAddress cell, string formula) {
-            cell.CellReference.SetFormula(formula);
+            if (cell.Count == 1) {
+                 cell.CellReference.SetFormula(formula);
+             } else {
+                 foreach (var item in cell.GetCells()) {
+                     item.CellReference.SetFormula(formula);
+                 }
+             }
+        }
+
+        public static bool HasFormula(this CellAddress cell) {
+            return cell.GetCells().Any(c => c.GetFormula() != string.Empty);
+        }
+
+        public static string GetFormula(this CellAddress cell) {
+            return cell.CellReference.GetFormula();
+        }
+
+
+        public static void ClearFormula(this CellAddress cell) {
+            if (cell.Count == 1) {
+                cell.CellReference.ClearFormula();
+            } else {
+                foreach (var item in cell.GetCells()) {
+                    item.CellReference.ClearFormula();
+                }
+            }
         }
 
         /// <summary>

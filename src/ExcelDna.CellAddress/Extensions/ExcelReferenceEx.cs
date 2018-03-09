@@ -32,7 +32,7 @@ namespace ExcelDna.Extensions{
     /// <summary>
     /// <see cref="ExcelReference"/> 扩展方法
     /// </summary>
-    public static class ExcelReferenceExtensions{
+    internal static class ExcelReferenceExtensions{
 
         #region ExcelReference 基本扩展方法
 
@@ -52,13 +52,6 @@ namespace ExcelDna.Extensions{
             }
             return ((object[,]) range.GetValue()).AsIEnumerable<T>();
         }
-
-/*
-        public static IEnumerable<T> GetValues<T>(this IEnumerable<ExcelReference> ranges)
-        {
-            return ranges.Cells().Select(c => c.GetValue()).OfType<T>();
-        }
-*/
 
         private static bool IsSingleCell(this ExcelReference reference) {
             return reference.ColumnFirst == reference.ColumnLast && reference.RowFirst == reference.RowLast;
@@ -137,15 +130,6 @@ namespace ExcelDna.Extensions{
         /// </summary>
         /// <param name="reference"></param>
         public static void Activate(this ExcelReference reference) {
-            XlCall.Excel(XlCall.xlcFormulaGoto, reference);
-            XlCall.Excel(XlCall.xlcSelect, reference, Type.Missing);
-        }
-
-        /// <summary>
-        /// 选中单元格
-        /// </summary>
-        /// <param name="reference"></param>
-        public static void Select(this ExcelReference reference){
             XlCall.Excel(XlCall.xlcFormulaGoto, reference);
             XlCall.Excel(XlCall.xlcSelect, reference, Type.Missing);
         }
@@ -429,7 +413,7 @@ namespace ExcelDna.Extensions{
             IEnumerable<ExcelReference> cells = range.Cells();
             foreach (ExcelReference cell in cells){
                 //删除公式
-                XlCall.Excel(XlCall.xlcFormula, string.Empty, cell);
+                XlCall.Excel(XlCall.xlcFormula,ExcelEmpty.Value, cell);
             }
         }
 
