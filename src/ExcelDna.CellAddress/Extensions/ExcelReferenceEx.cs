@@ -32,7 +32,7 @@ namespace ExcelDna.Extensions{
     /// <summary>
     /// <see cref="ExcelReference"/> 扩展方法
     /// </summary>
-    internal static class ExcelReferenceExtensions{
+    public static class ExcelReferenceExtensions{
 
         #region ExcelReference 基本扩展方法
 

@@ -3,9 +3,10 @@ set Configuration=Release
 set YYYYmmdd=%date:~0,4%%date:~5,2%%date:~8,2%
 Set suffix=build%YYYYmmdd%
 
-Set version-suffix=-Suffix %suffix%
+Set version-suffix=--version-suffix %suffix%
 
 
-cd ../src/ExcelDna.CellAddress
-dotnet pack -c %Configuration% -o %outputPath%
-REM --version-suffix %version-sufix%  Configuration=%Configuration%
+cd ../src/
+dotnet build ExcelDna.CellAddress  --configuration %Configuration%
+dotnet pack ExcelDna.CellAddress  --configuration %Configuration%  %version-suffix%  -o %outputPath%
+cd ../tools/

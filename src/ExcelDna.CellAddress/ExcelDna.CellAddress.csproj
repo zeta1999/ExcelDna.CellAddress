@@ -1,9 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net40</TargetFramework>
     <AssemblyName>ExcelDna.CellAddress</AssemblyName>
     <RootNamespace>ExcelDna</RootNamespace>
+    <VersionPrefix>1.0.1</VersionPrefix>
+    <Company>Lingya Tech CO.</Company>
+    <Authors>zwq00000@hotmail.com</Authors>
+    <Description>ExcelDna Cell Address Extensions,support Range and ExcelReference   formats.</Description>
+    <PackageTags>ExcelDna</PackageTags>
+    <RepositoryUrl>https://github.com/zwq00000/ExcelDna.CellAddress.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/zwq00000/ExcelDna.CellAddress.git</PackageProjectUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
