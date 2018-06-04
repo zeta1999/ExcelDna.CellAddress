@@ -57,7 +57,7 @@ namespace ExcelDna.Extensions{
             return reference.ColumnFirst == reference.ColumnLast && reference.RowFirst == reference.RowLast;
         }
 
-/*
+
         /// <summary>
         ///     单元格范围地址
         /// </summary>
@@ -66,63 +66,23 @@ namespace ExcelDna.Extensions{
         public static string Address(this ExcelReference range){
             string sheetName = range.SheetNameLocal();
 
-            if (range.IsSingleCell()) {
-                return $"{sheetName}!${range.ColumnFirst.ColumnName()}${range.RowFirst + 1}";
-            }
-            return
-                $"{sheetName}!${range.ColumnFirst.ColumnName()}${range.RowFirst + 1}:${range.ColumnLast.ColumnName()}${range.RowLast + 1}";
+            return $"{sheetName}!{range.AddressLocal()}";
 
-            //return string.Join(",", range.InnerReferences.Select(r => r.Address()));
         }
-*/
 
-/*
+
+
         /// <summary>
         ///     ExcelReference 本地地址 (不包括 Worksheet 名称)
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
         public static string AddressLocal(this ExcelReference range){
-            if (range.IsSingleCell()){
-                    return $"${range.ColumnFirst.ColumnName()}${range.RowFirst + 1}";
-               }
-                return
-                    $"${range.ColumnFirst.ColumnName()}${range.RowFirst + 1}:${range.ColumnLast.ColumnName()}${range.RowLast + 1}";
+            if (range.IsSingleCell()) {
+                AddressParser.ToAddress(range.RowFirst, range.ColumnLast);
+            }
+            return $"{AddressParser.ToAddress(range.RowFirst,range.ColumnFirst)}:{AddressParser.ToAddress(range.RowLast,range.ColumnLast)}";
         }
-*/
-
-/*
-        /// <summary>
-        ///     根据 列索引 计算列名 0=>A  1=>B
-        ///     从 0 开始计算
-        /// </summary>
-        /// <param name="columnIndex"></param>
-        /// <returns></returns>
-        private static string ColumnName(this int columnIndex){
-            if (columnIndex < 0){
-                throw new ArgumentOutOfRangeException(nameof(columnIndex), "列索引不能小于 0");
-            }
-            if (columnIndex < 26){
-                return ((char) ('A' + columnIndex)).ToString();
-            }
-            if (columnIndex < 26 + (26*26)){
-                var nameChars = new char[2];
-                nameChars[0] = (char) ('A' + (int) (Math.Floor((double) columnIndex/26)) - 1);
-                nameChars[1] = (char) ('A' + (columnIndex%26));
-                return new string(nameChars);
-            }
-            if (columnIndex < 26 + (26*26) + (26*26*26)){
-                double modValue = columnIndex - 26;
-                var nameChars = new char[3];
-                nameChars[0] = (char) ('A' + (int) (Math.Floor(modValue/(26*26))) - 1);
-                modValue = modValue%(26*26);
-                nameChars[1] = (char) ('A' + (int) (Math.Floor(modValue/26)));
-                nameChars[2] = (char) ('A' + (columnIndex%26));
-                return new string(nameChars);
-            }
-            throw new ArgumentException("超出列名范围");
-        }
-*/
 
 
         /// <summary>
