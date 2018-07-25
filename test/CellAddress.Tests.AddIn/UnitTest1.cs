@@ -1,9 +1,8 @@
-using System;
 using ExcelDna;
 using ExcelDna.Integration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExcelDna.Tests
+namespace CellAddressTests.AddIn
 {
     [TestClass]
     public class CellAddressTest

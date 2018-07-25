@@ -6,7 +6,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Security;
-using System.Text;
 
 namespace ExcelDna.Extensions {
     /// <summary>
@@ -111,149 +110,6 @@ namespace ExcelDna.Extensions {
 
         #endregion MemberAccess
 
-        /// <summary>
-        ///     根据 <see cref="DefaultValueAttribute" /> 获取对象的默认属性
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <typeparam name="TValue"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public static TValue GetDefaultValue<TModel, TValue>(this TModel t, Expression<Func<TModel, TValue>> expression)
-            where TModel : class {
-            if (t == null) {
-                throw new ArgumentNullException(nameof(t));
-            }
-            if (expression == null) {
-                throw new ArgumentNullException(nameof(expression));
-            }
-
-            // Gets the attributes for the property.
-            expression.AssertExpression(ExpressionType.MemberAccess);
-            AttributeCollection attributes = TypeDescriptor.GetProperties(t)[MemberName(expression)].Attributes;
-            var attribute = (DefaultValueAttribute)attributes[typeof(DefaultValueAttribute)];
-            return (TValue)attribute.Value;
-        }
-
-        /// <summary>
-        ///     在指定 String 数组的每个元素之间串联指定的分隔符 String，从而产生单个串联的字符串
-        ///     参见 <see cref="String.Join(string,string[])" />
-        /// </summary>
-        /// <param name="separator"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public static string Join(this string separator, IEnumerable<string> values) {
-            if (values == null) {
-                throw new ArgumentNullException(nameof(values));
-            }
-            if (separator == null) {
-                separator = string.Empty;
-            }
-            using (IEnumerator<string> enumerator = values.GetEnumerator()) {
-                if (!enumerator.MoveNext()) {
-                    return string.Empty;
-                }
-                var builder = new StringBuilder();
-                if (enumerator.Current != null) {
-                    builder.Append(enumerator.Current);
-                }
-                while (enumerator.MoveNext()) {
-                    builder.Append(separator);
-                    if (enumerator.Current != null) {
-                        builder.Append(enumerator.Current);
-                    }
-                }
-                return builder.ToString();
-            }
-        }
-
-        #region LoadType
-
-        /// <summary>
-        ///     根据名称加载类型
-        /// </summary>
-        /// <param name="typeName"></param>
-        /// <returns></returns>
-        public static Type LoadType(this string typeName) {
-            if (string.IsNullOrEmpty(typeName)) {
-                return null;
-            }
-            Type itemType = GetTypeFromString(typeName, false, false);
-            if (itemType != null) {
-                return itemType;
-            }
-            return null;
-        }
-
-        /// <summary>
-        ///     根据 程序集名称 加载程序集
-        /// </summary>
-        /// <param name="assemblyName"></param>
-        /// <returns></returns>
-        public static Assembly LoadAssembly(this string assemblyName) {
-            if (!string.IsNullOrEmpty(assemblyName)) {
-                try {
-                    return Assembly.Load(assemblyName);
-                } catch (Exception ex) {
-                    Trace.WriteLine("加载程序集 " + assemblyName + " 发生错误," + ex.Message);
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        ///     根据类型名称获得类型对象
-        /// </summary>
-        /// <param name="typeName"></param>
-        /// <param name="throwOnError"></param>
-        /// <param name="ignoreCase"></param>
-        /// <returns></returns>
-        private static Type GetTypeFromString(string typeName, bool throwOnError, bool ignoreCase) {
-            return GetTypeFromString(Assembly.GetCallingAssembly(), typeName, throwOnError, ignoreCase);
-        }
-
-        public static Type GetTypeFromString(Assembly relativeAssembly,
-                                             string typeName,
-                                             bool throwOnError,
-                                             bool ignoreCase) {
-            // Check if the type name specifies the assembly name
-            if (typeName.IndexOf(',') == -1) {
-                // Attempt to lookup the type from the relativeAssembly
-                Type type = relativeAssembly.GetType(typeName, false, ignoreCase);
-                if (type != null) {
-                    // Found type in relative assembly
-                    return type;
-                }
-                Assembly[] loadedAssemblies = null;
-                try {
-                    loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-                } catch (SecurityException) {
-                    // Insufficient permissions to get the list of loaded assemblies
-                }
-                if (loadedAssemblies != null) {
-                    // Search the loaded assemblies for the type
-                    foreach (Assembly assembly in loadedAssemblies) {
-                        type = assembly.GetType(typeName, false, ignoreCase);
-                        if (type != null) {
-                            // Found type in loaded assembly
-                            return type;
-                        }
-                    }
-                }
-                // Didn't find the type
-                if (throwOnError) {
-                    throw new TypeLoadException("不能加载类型 [" + typeName + "]. Tried assembly [" +
-                                                relativeAssembly.FullName +
-                                                "] and all loaded assemblies");
-                }
-                return null;
-            }
-            // Includes explicit assembly name
-            //LogLog.Debug("SystemInfo: Loading type ["+typeName+"] from global Type");
-            return Type.GetType(typeName, throwOnError, ignoreCase);
-        }
-
-        #endregion LoadType
 
         #region DisplayName
 
@@ -266,22 +122,6 @@ namespace ExcelDna.Extensions {
             DisplayNameAttribute attributes =
                 TypeDescriptor.GetAttributes(modelType).OfType<DisplayNameAttribute>().FirstOrDefault();
             return attributes != null ? attributes.DisplayName : modelType.Name;
-        }
-
-        /// <summary>
-        ///     根据表达式获取 成员显示名称
-        ///     <seealso cref="DisplayNameAttribute" />
-        ///     对于枚举类型 使用 DescriptionAttribute 属性
-        ///     <seealso cref="DescriptionAttribute" />
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <returns></returns>
-        public static string DisplayName<TModel>(string memberName) {
-            PropertyDescriptor propertyInfo = TypeDescriptor.GetProperties(typeof(TModel))[memberName];
-            if (propertyInfo != null) {
-                return propertyInfo.DisplayName;
-            }
-            return memberName;
         }
 
         /// <summary>
@@ -351,21 +191,10 @@ namespace ExcelDna.Extensions {
         ///     根据表达式获取 成员名称
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
-        /// <param name="expression"></param>
-        /// <returns></returns>
-        public static string MemberName<TModel>(this Expression<Func<TModel, object>> expression) {
-            return expression.GetMemberInfo().Name;
-        }
-
-        /// <summary>
-        ///     根据表达式获取 成员名称
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static string MemberName<TModel, TValue>(this Expression<Func<TModel, TValue>> expression)
-            where TModel : class {
+        public static string MemberName<TModel, TValue>(this Expression<Func<TModel, TValue>> expression){
             if (expression == null) {
                 throw new ArgumentNullException(nameof(expression));
             }
@@ -380,8 +209,7 @@ namespace ExcelDna.Extensions {
         /// <param name="t"></param>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static string MemberName<TModel, TValue>(this TModel t, Expression<Func<TModel, TValue>> expression)
-            where TModel : class {
+        public static string MemberName<TModel, TValue>(this TModel t, Expression<Func<TModel, TValue>> expression) {
             if (t == null) {
                 throw new ArgumentNullException(nameof(t));
             }
@@ -397,8 +225,7 @@ namespace ExcelDna.Extensions {
         /// <param name="expression"></param>
         /// <returns></returns>
         public static string MemberName<TModel, TValue>(this IEnumerable<TModel> t,
-                                                        Expression<Func<TModel, TValue>> expression)
-            where TModel : class {
+                                                        Expression<Func<TModel, TValue>> expression) {
             if (t == null) {
                 throw new ArgumentNullException(nameof(t));
             }
@@ -408,24 +235,30 @@ namespace ExcelDna.Extensions {
         #endregion MemberName
 
         #region DefaultValue
-
         /// <summary>
-        ///     <see cref="Nullable{T}">可空结构</see> 默认值
+        ///     根据 <see cref="DefaultValueAttribute" /> 获取对象的默认属性
         /// </summary>
-        /// <param name="value"></param>
+        /// <typeparam name="TModel"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        public static T Default<T>(this T? value) where T : struct {
-            return value ?? new T();
-        }
+        public static TValue GetDefaultValue<TModel, TValue>(this TModel t, Expression<Func<TModel, TValue>> expression)
+            where TModel : class {
+            if (t == null) {
+                throw new ArgumentNullException(nameof(t));
+            }
+            if (expression == null) {
+                throw new ArgumentNullException(nameof(expression));
+            }
 
-        /// <summary>
-        ///     <see cref="Nullable{T}">可空结构</see> 默认值
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="defaultValue">若为空时给定的默认值</param>
-        /// <returns></returns>
-        public static T Default<T>(this T? value, T defaultValue) where T : struct {
-            return value ?? defaultValue;
+            var defaultValue = expression.GetMemberInfo().GetCustomAttributes(typeof(DefaultValueAttribute), true)
+                .OfType<DefaultValueAttribute>().Select(d => d.Value).FirstOrDefault();
+            if (defaultValue == null) {
+                return default(TValue);
+            } else {
+                return (TValue)defaultValue;
+            }
         }
 
         #endregion DefaultValue
