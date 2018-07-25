@@ -70,8 +70,6 @@ namespace ExcelDna.Extensions{
 
         }
 
-
-
         /// <summary>
         ///     ExcelReference 本地地址 (不包括 Worksheet 名称)
         /// </summary>

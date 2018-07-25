@@ -223,7 +223,7 @@ namespace ExcelDna.Extensions{
             return (T) Convert.ChangeType(vt, toType);
         }
 
-        public static void ConvertVT<T>(this object vt, out T value){
+        private static void ConvertVT<T>(this object vt, out T value){
             value = vt.ConvertTo<T>();
         }
 
@@ -238,7 +238,7 @@ namespace ExcelDna.Extensions{
             return retval;
         }
 
-        public static T[] ToVector<T>(this object[,] vt){
+        private static T[] ToVector<T>(this object[,] vt){
             int n = vt.GetLength(0), k = vt.GetLength(1);
             int l = 0;
 

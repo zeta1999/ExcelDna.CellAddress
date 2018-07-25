@@ -11,6 +11,13 @@ namespace ExcelDna {
     /// 单元格地址
     /// </summary>
     public class CellAddress : IEquatable<CellAddress> {
+
+        /// <summary>
+        /// 单元格数据访问使用 <see cref="ExcelReference"/> 方式
+        /// 需要在 ExcelDna 插件环境中使用
+        /// </summary>
+        public static bool UseExcelReference = true;
+
         /// <summary>
         /// 不正确的单元格引用
         /// </summary>
@@ -279,6 +286,9 @@ namespace ExcelDna {
         /// </returns>
         public override int GetHashCode() {
             unchecked {
+                if (string.IsNullOrEmpty(SheetName)) {
+                    return LocalAddress.GetHashCode();
+                }
                 return SheetName.GetHashCode() ^ LocalAddress.GetHashCode();
             }
         }

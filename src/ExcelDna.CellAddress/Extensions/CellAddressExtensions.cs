@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using ExcelDna.Integration;
-using Microsoft.Office.Interop.Excel;
 
 namespace ExcelDna.Extensions {
     public static class CellAddressExtensions {
@@ -25,7 +23,7 @@ namespace ExcelDna.Extensions {
                 //列优先
                 return range.GetCell(index % range.Rows, index / range.Rows);
             }
-            return range.GetCell(index / range.Columns,index % range.Columns);
+            return range.GetCell(index / range.Columns, index % range.Columns);
         }
 
         public static CellAddress GetCell(this CellAddress cell, int rowIndex = 0, int columnIndex = 0) {
@@ -39,7 +37,7 @@ namespace ExcelDna.Extensions {
         /// <param name="direction">遍历方向</param>
         /// <returns></returns>
         public static IEnumerable<CellAddress> GetCells(this CellAddress cellRange, XlFillDirection direction = XlFillDirection.RowFirst) {
-            if (cellRange!= CellAddress.Ref) {
+            if (cellRange != CellAddress.Ref) {
                 for (var i = 0; i < cellRange.Count; i++) {
                     yield return cellRange.GetCell(i, direction);
                 }
@@ -121,12 +119,22 @@ namespace ExcelDna.Extensions {
         /// </summary>
         /// <returns></returns>
         public static T GetValue<T>(this CellAddress address) {
-            var reference = address.CellReference;
-            if (reference.IsEmpty()) {
-                return default(T);
-            }
-            return reference.GetValue<T>();
+            return address.GetValueInternal<T>();
         }
+
+        private static T GetValueInternal<T>(this CellAddress address) {
+            if (CellAddress.UseExcelReference) {
+                var reference = address.CellReference;
+                if (reference.IsEmpty()) {
+                    return default(T);
+                }
+                return reference.GetValue<T>();
+            } else {
+                var range = address.CellRange;
+                return range.Value2.ConvertTo<T>();
+            }
+        }
+
         /// <summary>
         /// 从单元格读取数据
         /// </summary>
@@ -135,15 +143,30 @@ namespace ExcelDna.Extensions {
             if (address.Count == 1) {
                 return new T[] { address.GetValue<T>() };
             }
-            if (address.HasRange) {
+            return address.GetValuesInternal<T>();
+        }
+
+        /// <summary>
+        /// 从单元格读取数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        private static IEnumerable<T> GetValuesInternal<T>(this CellAddress address) {
+            if (address.Count == 1) {
+                return new T[] { address.GetValue<T>() };
+            }
+
+            if (CellAddress.UseExcelReference) {
+                var reference = address.CellReference;
+                if (!reference.IsEmpty()) {
+                    return reference.GetValues<T>();
+                }
+                return new T[0];
+            } else {
                 var values = address.CellRange.Value2 as object[,];
                 return values.AsIEnumerable<T>();
             }
-            var reference = address.CellReference;
-            if (!reference.IsEmpty()) {
-                return reference.GetValues<T>();
-            }
-            return new T[0];
         }
 
         /// <summary>
@@ -170,11 +193,15 @@ namespace ExcelDna.Extensions {
             }
         }
 
-        private static void SetValueInternal(this CellAddress cell, object[,] value) {            
-            try {
-                cell.CellReference.SetValue(value);
-            } catch (XlCallException) {
-                throw new Exception($"{cell}单元格定义错误,无法写入该单元格");
+        private static void SetValueInternal(this CellAddress cell, object[,] value) {
+            if (CellAddress.UseExcelReference) {
+                try {
+                    cell.CellReference.SetValue(value);
+                } catch (XlCallException) {
+                    throw new Exception($"{cell}单元格定义错误,无法写入该单元格");
+                }
+            } else {
+                cell.CellRange.Value2 = value;
             }
         }
 
@@ -185,29 +212,47 @@ namespace ExcelDna.Extensions {
         /// <param name="formula"></param>
         public static void SetFormula(this CellAddress cell, string formula) {
             if (cell.Count == 1) {
-                 cell.CellReference.SetFormula(formula);
-             } else {
-                 foreach (var item in cell.GetCells()) {
-                     item.CellReference.SetFormula(formula);
-                 }
-             }
+                cell.CellReference.SetFormula(formula);
+            } else {
+                foreach (var item in cell.GetCells()) {
+                    item.CellReference.SetFormula(formula);
+                }
+            }
         }
 
         public static bool HasFormula(this CellAddress cell) {
-            return cell.GetCells().Any(c => c.GetFormula() != string.Empty);
+            if (CellAddress.UseExcelReference) {
+                return cell.GetCells().Any(c => c.GetFormula() != string.Empty);
+            } else {
+                return (bool) cell.CellRange.HasFormula;
+            }
         }
 
         public static string GetFormula(this CellAddress cell) {
-            return cell.CellReference.GetFormula();
+            if (CellAddress.UseExcelReference) {
+                return cell.CellReference.GetFormula();
+            } else {
+                if ((bool) cell.CellRange.HasFormula) {
+                    return (string)cell.CellRange.FormulaLocal;
+                } else {
+                    return string.Empty;
+                }
+            }
         }
 
 
         public static void ClearFormula(this CellAddress cell) {
-            if (cell.Count == 1) {
-                cell.CellReference.ClearFormula();
+            if (CellAddress.UseExcelReference) {
+                if (cell.Count == 1) {
+                    cell.CellReference.ClearFormula();
+                } else {
+                    foreach (var item in cell.GetCells()) {
+                        item.CellReference.ClearFormula();
+                    }
+                }
             } else {
-                foreach (var item in cell.GetCells()) {
-                    item.CellReference.ClearFormula();
+                if ((bool) cell.CellRange.HasFormula) {
+                    cell.CellRange.FormulaLocal = ExcelEmpty.Value;
                 }
             }
         }
@@ -234,7 +279,12 @@ namespace ExcelDna.Extensions {
             if (cell == null) {
                 throw new ArgumentNullException(nameof(cell));
             }
-            cell.CellReference.SetValue(ExcelEmpty.Value);
+
+            if (CellAddress.UseExcelReference) {
+                cell.CellReference.SetValue(ExcelEmpty.Value);
+            } else {
+                cell.CellRange.ClearContents();
+            }
         }
 
         #endregion
@@ -244,23 +294,18 @@ namespace ExcelDna.Extensions {
         /// </summary>
         /// <param name="cell"></param>
         public static void Activate(this CellAddress cell) {
-            cell?.CellReference.Activate();
-        }
-
-        internal static Range GetRange(this string celladdress) {
-            try {
-                var xlApp = ExcelDnaUtil.Application;
-                if (!(xlApp is Application application)) {
-                    throw new NullReferenceException();
-                }
-                return application.Range[celladdress];
-            } catch (InvalidOperationException ioe) {
-                //当前 ExcelApplication 不可用
-                Trace.TraceWarning("GetRange Error {0}", ioe);
-                throw;
+            if (CellAddress.UseExcelReference) {
+                cell?.CellReference.Activate();
+            } else {
+                cell.CellRange.Activate();
             }
         }
 
+        /// <summary>
+        /// 获取 单元格集合所在的范围
+        /// </summary>
+        /// <param name="cells"></param>
+        /// <returns></returns>
         public static CellAddress GetRange(this IEnumerable<CellAddress> cells) {
             if (cells == null) {
                 return CellAddress.Ref;
