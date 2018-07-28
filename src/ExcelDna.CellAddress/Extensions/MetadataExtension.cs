@@ -306,7 +306,7 @@ namespace ExcelDna.Extensions {
         /// </summary>
         /// <param name="lambda"></param>
         /// <returns></returns>
-        private static MemberInfo GetMemberInfo(this LambdaExpression lambda) {
+        public static MemberInfo GetMemberInfo(this LambdaExpression lambda) {
             return GetMemberInfo(lambda.Body);
         }
         /// <summary>

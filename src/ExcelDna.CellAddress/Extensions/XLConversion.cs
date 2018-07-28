@@ -41,11 +41,11 @@ namespace ExcelDna.Extensions{
         }
 
         public static object ConvertTo(this object vt, Type toType){
-            Type fromType = vt.GetType();
-
             if (vt == null){
                 return GetDefault(toType);
             }
+
+            Type fromType = vt.GetType();
             if (fromType == typeof (DBNull)){
                 return GetDefault(toType);
             }
