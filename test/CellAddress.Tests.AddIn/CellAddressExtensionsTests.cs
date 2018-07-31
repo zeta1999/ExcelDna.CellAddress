@@ -87,6 +87,32 @@ namespace CellAddressTests.AddIn {
             };
             Assert.AreEqual("A1:F5", cells.GetRange().LocalAddress);
         }
+
+        [TestMethod]
+        public void TestGetCell() {
+            var cell = CellAddress.Parse("Sheet1!A1:B2");
+            Assert.AreEqual(4,cell.Count);
+            Assert.AreEqual(0, cell.ColumnFirst);
+            Assert.AreEqual(0, cell.RowFirst);
+
+            var nextCol = cell.GetCell(1, XlFillDirection.RowFirst);
+            Assert.AreEqual("A2",nextCol.LocalAddress);
+
+            var nextRow = cell.GetCell(1, XlFillDirection.ColumnFirst);
+            Assert.AreEqual("B1",nextRow.LocalAddress);
+        }
+
+        [TestMethod]
+        public void TestNextCell() {
+            var cell = CellAddress.Parse("Sheet1!A1:B2");
+            Assert.AreEqual(4, cell.Count);
+
+            var nextCol = cell.NextCell(1, XlFillDirection.RowFirst);
+            Assert.AreEqual("A2", nextCol.LocalAddress);
+
+            var nextRow = cell.NextCell(1, XlFillDirection.ColumnFirst);
+            Assert.AreEqual("B1", nextRow.LocalAddress);
+        }
     }
     /*
     [TestClass]

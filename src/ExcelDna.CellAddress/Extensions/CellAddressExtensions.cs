@@ -6,41 +6,68 @@ using ExcelDna.Integration;
 namespace ExcelDna.Extensions {
     public static class CellAddressExtensions {
         /// <summary>
-        /// 根据索引返回第n个单元格
+        /// 根据索引返回区域内部的第n个单元格
         /// </summary>
         /// <param name="range"></param>
         /// <param name="index"></param>
         /// <param name="direction">排列顺序(行优先/列优先)</param>
-        /// <returns></returns>
+        /// <returns>单一单元格</returns>
         public static CellAddress GetCell(this CellAddress range, int index, XlFillDirection direction = XlFillDirection.RowFirst) {
-            if (index >= range.Count && index < -1) {
-                throw new IndexOutOfRangeException($"索引超出范围,-1< index < {range.Count}");
+            if (index < -1) {
+                throw new IndexOutOfRangeException($"索引超出范围,-1< index ");
+            }
+
+            if (index >= range.Count) {
+                throw new IndexOutOfRangeException($"索引超出范围,index < {range.Count}");
             }
             if (range.Count == 1 && index == 0) {
                 return range;
             }
-            if (direction == XlFillDirection.ColumnFirst) {
+            if (direction == XlFillDirection.RowFirst) {
                 //列优先
                 return range.GetCell(index % range.Rows, index / range.Rows);
             }
             return range.GetCell(index / range.Columns, index % range.Columns);
         }
 
-        public static CellAddress GetCell(this CellAddress cell, int rowIndex = 0, int columnIndex = 0) {
-            return new CellAddress(cell.SheetName, cell.RowFirst + rowIndex, cell.ColumnFirst + columnIndex);
+        /// <summary>
+        /// 根据索引返回区域内部的第n个单元格
+        /// </summary>
+        /// <param name="range"></param>
+        /// <param name="rowIndex"></param>
+        /// <param name="columnIndex"></param>
+        /// <returns></returns>
+        public static CellAddress GetCell(this CellAddress range, int rowIndex = 0, int columnIndex = 0) {
+            return new CellAddress(range.SheetName, range.RowFirst + rowIndex, range.ColumnFirst + columnIndex);
+        }
+
+        /// <summary>
+        /// 根据 <see cref="direction">方向指示</see> 返回下一个单元格
+        /// 不论起始的单元格大小,都从左上角第一个单元格开始计算位置
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="index"></param>
+        /// <param name="direction"></param>
+        /// <returns></returns>
+        public static CellAddress NextCell(this CellAddress cell,int index = 1,XlFillDirection direction = XlFillDirection.RowFirst) {
+            if (direction == XlFillDirection.ColumnFirst) {
+                //列优先,向下
+                return cell.GetCell(0,index);
+            } else {
+                //行优先 ,向右扩展
+                return cell.GetCell(index,0);
+            }
         }
 
         /// <summary>
         /// 获取单元格序列
         /// </summary>
-        /// <param name="cellRange"></param>
+        /// <param name="range"></param>
         /// <param name="direction">遍历方向</param>
         /// <returns></returns>
-        public static IEnumerable<CellAddress> GetCells(this CellAddress cellRange, XlFillDirection direction = XlFillDirection.RowFirst) {
-            if (cellRange != CellAddress.Ref) {
-                for (var i = 0; i < cellRange.Count; i++) {
-                    yield return cellRange.GetCell(i, direction);
-                }
+        public static IEnumerable<CellAddress> GetCells(this CellAddress range, XlFillDirection direction = XlFillDirection.RowFirst) {
+            for (var i = 0; i < range.Count; i++) {
+                yield return range.GetCell(i, direction);
             }
         }
 
@@ -224,7 +251,7 @@ namespace ExcelDna.Extensions {
             if (CellAddress.UseExcelReference) {
                 return cell.GetCells().Any(c => c.GetFormula() != string.Empty);
             } else {
-                return (bool) cell.CellRange.HasFormula;
+                return (bool)cell.CellRange.HasFormula;
             }
         }
 
@@ -232,7 +259,7 @@ namespace ExcelDna.Extensions {
             if (CellAddress.UseExcelReference) {
                 return cell.CellReference.GetFormula();
             } else {
-                if ((bool) cell.CellRange.HasFormula) {
+                if ((bool)cell.CellRange.HasFormula) {
                     return (string)cell.CellRange.FormulaLocal;
                 } else {
                     return string.Empty;
@@ -251,7 +278,7 @@ namespace ExcelDna.Extensions {
                     }
                 }
             } else {
-                if ((bool) cell.CellRange.HasFormula) {
+                if ((bool)cell.CellRange.HasFormula) {
                     cell.CellRange.FormulaLocal = ExcelEmpty.Value;
                 }
             }

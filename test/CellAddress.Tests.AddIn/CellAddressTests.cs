@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace CellAddressTests.AddIn
 {
     [TestClass]
-    public class CellAddressTest
+    public class CellAddressTests
 
     {
         [TestMethod]
@@ -25,4 +25,5 @@ namespace CellAddressTests.AddIn
             Assert.AreEqual("A1",cell.LocalAddress);
         }
     }
+
 }
