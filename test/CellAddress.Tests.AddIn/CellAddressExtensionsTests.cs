@@ -113,6 +113,26 @@ namespace CellAddressTests.AddIn {
             var nextRow = cell.NextCell(1, XlFillDirection.ColumnFirst);
             Assert.AreEqual("B1", nextRow.LocalAddress);
         }
+
+        [TestMethod]
+        public void TestGetCellForColumn() {
+            var diect = XlFillDirection.ColumnFirst;
+            var range = CellAddress.Parse("Sheet1!A1:F10");
+            for (int i = 0; i < range.Count; i++) {
+                var cell = range.GetCell(i, diect);
+                Console.WriteLine($"{i}:{cell.LocalAddress}");
+            }
+        }
+
+        [TestMethod]
+        public void TestGetCellForRow() {
+            var diect = XlFillDirection.RowFirst;
+            var range = CellAddress.Parse("Sheet1!A1:F10");
+            for (int i = 0; i < range.Count; i++) {
+                var cell = range.GetCell(i, diect);
+                Console.WriteLine($"{i}:{cell.LocalAddress}");
+            }
+        }
     }
     /*
     [TestClass]

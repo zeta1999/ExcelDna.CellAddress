@@ -53,6 +53,11 @@ namespace ExcelDna.Extensions{
             return ((object[,]) range.GetValue()).AsIEnumerable<T>();
         }
 
+        /// <summary>
+        /// 返回给定<see cref="ExcelReference"/>是否为单一单元格
+        /// </summary>
+        /// <param name="reference"></param>
+        /// <returns></returns>
         private static bool IsSingleCell(this ExcelReference reference) {
             return reference.ColumnFirst == reference.ColumnLast && reference.RowFirst == reference.RowLast;
         }
@@ -77,7 +82,7 @@ namespace ExcelDna.Extensions{
         /// <returns></returns>
         public static string AddressLocal(this ExcelReference range){
             if (range.IsSingleCell()) {
-                AddressParser.ToAddress(range.RowFirst, range.ColumnLast);
+                return  AddressParser.ToAddress(range.RowFirst, range.ColumnLast);
             }
             return $"{AddressParser.ToAddress(range.RowFirst,range.ColumnFirst)}:{AddressParser.ToAddress(range.RowLast,range.ColumnLast)}";
         }
