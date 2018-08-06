@@ -87,6 +87,25 @@ namespace ExcelDna.Extensions{
             return $"{AddressParser.ToAddress(range.RowFirst,range.ColumnFirst)}:{AddressParser.ToAddress(range.RowLast,range.ColumnLast)}";
         }
 
+        public static string AddressR1C1(this ExcelReference range) {
+            if (range.IsSingleCell()) {
+                return AddressParser.ToAddressR1C1(range.RowFirst, range.ColumnLast);
+            }
+            return $"{AddressParser.ToAddressR1C1(range.RowFirst, range.ColumnFirst)}:{AddressParser.ToAddressR1C1(range.RowLast, range.ColumnLast)}";
+        }
+
+        /// <summary>
+        /// 获取 指向单元格的公式
+        /// </summary>
+        /// <param name="range"></param>
+        /// <param name="useFirstCell">使用单元格范围中第一个单元格</param>
+        /// <returns></returns>
+        public static string GetFormula(this ExcelReference range,bool useFirstCell = false) {
+            if (useFirstCell|| range.IsSingleCell()) {
+                return $"={range.SheetNameLocal()}!${AddressParser.GetColumnName(range.ColumnFirst)}${range.ColumnLast+1}";
+            }
+            return $"={range.SheetNameLocal()}!${AddressParser.GetColumnName(range.ColumnFirst)}${range.RowFirst+1}:${AddressParser.GetColumnName(range.ColumnLast)}${range.RowLast+1}";
+        }
 
         /// <summary>
         /// 激活单元格

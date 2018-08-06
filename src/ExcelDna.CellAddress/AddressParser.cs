@@ -182,16 +182,23 @@ namespace ExcelDna {
             if (rowIndex < 0 || columnIndex < 0) {
                 return CellAddress.ErrorReference;
             }
-            return $"{GetColumnName(columnIndex)}{rowIndex + 1}";
+            return $"${GetColumnName(columnIndex)}${rowIndex + 1}";
         }
 
+        internal static string ToAddressR1C1(int rowIndex, int columnIndex) {
+            if (rowIndex < 0 || columnIndex < 0) {
+                return CellAddress.ErrorReference;
+            }
+            return $"R{rowIndex+1}C{columnIndex + 1}";
+        }
+        
         /// <summary>
         /// 获取列名 A~Z AA~ZZ ... ... XFD
         /// A~ZZ 702
         /// </summary>
         /// <param name="colNum">从 0 开始的列索引名称</param>
         /// <returns></returns>
-        private static string GetColumnName(int colNum) {
+        internal static string GetColumnName(int colNum) {
             if (colNum < 0 || colNum > 16384) {
                 return CellAddress.ErrorReference;
             }
