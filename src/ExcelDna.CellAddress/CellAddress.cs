@@ -220,7 +220,7 @@ namespace ExcelDna {
                         _cellReference = new ExcelReference(RowFirst, RowLast, ColumnFirst, ColumnLast);
                         SheetName = _cellReference.SheetNameLocal();
                     }
-                    Trace.TraceInformation($"CellAddress {LocalAddress} SheetId:{_cellReference.SheetId}");
+                    Debug.WriteLine($"CellAddress {LocalAddress} SheetId:{_cellReference.SheetId}");
                 }
                 return _cellReference;
             }

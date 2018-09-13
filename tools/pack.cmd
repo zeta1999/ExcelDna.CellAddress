@@ -10,3 +10,5 @@ cd ../src/
 dotnet build ExcelDna.CellAddress  --configuration %Configuration%
 dotnet pack ExcelDna.CellAddress  --configuration %Configuration%  %version-suffix%  -o %outputPath%
 cd ../tools/
+
+pause

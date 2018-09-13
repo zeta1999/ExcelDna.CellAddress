@@ -100,11 +100,11 @@ namespace ExcelDna.Extensions{
         /// <param name="range"></param>
         /// <param name="useFirstCell">使用单元格范围中第一个单元格</param>
         /// <returns></returns>
-        public static string GetFormula(this ExcelReference range,bool useFirstCell = false) {
+        public static string Formula(this ExcelReference range,bool useFirstCell = false) {
             if (useFirstCell|| range.IsSingleCell()) {
-                return $"={range.SheetNameLocal()}!${AddressParser.GetColumnName(range.ColumnFirst)}${range.ColumnLast+1}";
+                return $"=${AddressParser.GetColumnName(range.ColumnFirst)}${range.RowFirst+1}";
             }
-            return $"={range.SheetNameLocal()}!${AddressParser.GetColumnName(range.ColumnFirst)}${range.RowFirst+1}:${AddressParser.GetColumnName(range.ColumnLast)}${range.RowLast+1}";
+            return $"=${AddressParser.GetColumnName(range.ColumnFirst)}${range.RowFirst+1}:${AddressParser.GetColumnName(range.ColumnLast)}${range.RowLast+1}";
         }
 
         /// <summary>
