@@ -8,9 +8,11 @@ namespace ExcelDna {
     /// 支持 R1C1 格式和 A1 格式
     /// </summary>
     internal static class AddressParser {
+
         private static readonly Regex R1C1FormatRegex = new Regex(@".*R(?<R>\d+)C(?<C>\d+)", RegexOptions.Compiled);
 
-        private static readonly Regex A1FormatRegex = new Regex(@"\s*\$?(?<C>[A-Z]+)\$?(?<R>\d+)",
+        private static readonly Regex A1FormatRegex = new Regex(@"\s*(\$?(?<C>[A-Z]+))?(\$?(?<R>\d+))?",
+            //new Regex(@"\s*\$?(?<C>[A-Z]+)\$?(?<R>\d+)",
             RegexOptions.Compiled);
 
         public static bool IsR1C1Format(string address) {
@@ -139,8 +141,8 @@ namespace ExcelDna {
             var match = A1FormatRegex.Match(address, begining, length);
             var result = true;
             if (match.Success) {
-                result &= Int32.TryParse(match.Groups["R"].Value, out row);
-                result &= TryParseColumnIndex(match.Groups["C"].Value, out col);
+                result |= TryParseColumnIndex(match.Groups["C"].Value, out col);
+                result |= Int32.TryParse(match.Groups["R"].Value, out row);
             } else {
                 row = -1;
                 col = -1;
@@ -179,15 +181,39 @@ namespace ExcelDna {
         /// <param name="columnIndex"></param>
         /// <returns></returns>
         internal static string ToAddress(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || columnIndex < 0) {
+            if (rowIndex < 0 && columnIndex < 0) {
                 return CellAddress.ErrorReference;
+            }
+
+            if (rowIndex < 0) {
+                //整列
+                return $"${GetColumnName(columnIndex)}";
+            } 
+            if(columnIndex<0) {
+                //整行
+                return $"${rowIndex + 1}";
             }
             return $"${GetColumnName(columnIndex)}${rowIndex + 1}";
         }
 
+        /// <summary>
+        /// 从 0 开始的 行/列索引，计算 R1C1 格式地址
+        /// </summary>
+        /// <param name="rowIndex"></param>
+        /// <param name="columnIndex"></param>
+        /// <returns></returns>
         internal static string ToAddressR1C1(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || columnIndex < 0) {
+            if (rowIndex < 0 && columnIndex < 0) {
                 return CellAddress.ErrorReference;
+            }
+
+            if (rowIndex < 0) {
+                //整列
+                return $"C{columnIndex + 1}";
+            }
+            if (columnIndex < 0) {
+                //整行
+                return $"R{rowIndex + 1}";
             }
             return $"R{rowIndex+1}C{columnIndex + 1}";
         }

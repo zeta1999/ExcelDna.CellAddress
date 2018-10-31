@@ -13,6 +13,15 @@ namespace ExcelDna {
     public class CellAddress : IEquatable<CellAddress> {
 
         /// <summary>
+        /// Excel 行限制
+        /// </summary>
+        private const int RowsLimit = 1048576;
+        /// <summary>
+        /// Excel 列限制
+        /// </summary>
+        private const int ColumnsLimit = 16384;
+
+        /// <summary>
         /// 单元格数据访问使用 <see cref="ExcelReference"/> 方式
         /// 需要在 ExcelDna 插件环境中使用
         /// </summary>
@@ -67,17 +76,18 @@ namespace ExcelDna {
                 throw new ArgumentException("Range 只能包括一个区域");
             }
             SheetName = range.Worksheet.Name;
-            LocalAddress = range.Address;
+            var area = range.Areas.Item[1];
+            LocalAddress = area.Address;
             
-            Count = range.Count;
+            Count = area.Cells.Count;
             if (Count == 1) {
-                RowFirst = RowLast = range.Row - 1;
-                ColumnFirst = ColumnLast = range.Column - 1;
+                RowFirst = RowLast = area.Row - 1;
+                ColumnFirst = ColumnLast = area.Column - 1;
             } else {
                 RowFirst = range.Row - 1;
-                RowLast = RowFirst + range.Rows.Count - 1;
-                ColumnFirst = range.Column - 1;
-                ColumnLast = ColumnFirst + range.Columns.Count - 1;
+                RowLast = RowFirst + area.Rows.Count - 1;
+                ColumnFirst = area.Column - 1;
+                ColumnLast = ColumnFirst + area.Columns.Count - 1;
             }
         }
 
@@ -95,20 +105,43 @@ namespace ExcelDna {
         /// <param name="columnLast">从0开始的最后列索引</param>
         public CellAddress(string sheetName, int rowFirst, int rowLast, int columnFirst, int columnLast) {
             SheetName = sheetName;
-            if (rowFirst < 0 || rowLast < 0 || columnFirst < 0 || columnLast < 0) {
+            if (rowFirst < 0 && columnFirst < 0) {
                 throw new IndexOutOfRangeException("Row or Column out of range");
             }
-            if (columnFirst == columnLast && rowFirst == rowLast) {
-                LocalAddress = AddressParser.ToAddress(rowFirst, columnFirst);
+
+            if (rowLast < 0 || columnLast < 0) {
+                //整行/整列
+                if (rowLast < 0) {
+                    //整行
+                    RowFirst = 0;
+                    RowLast = RowsLimit-1;
+                    ColumnFirst = columnFirst;
+                    ColumnLast = columnLast;
+                    Count = Rows * ColumnsLimit;
+                } else {
+                    //整列
+                    RowFirst = rowFirst;
+                    RowLast = rowLast;
+                    ColumnFirst = 0;
+                    ColumnLast = ColumnsLimit-1;
+                    Count = Columns * RowsLimit;
+                }
+                LocalAddress = $"{AddressParser.ToAddress(rowFirst, columnFirst)}:{AddressParser.ToAddress(rowLast, columnLast)}";
             } else {
-                LocalAddress =
-                    $"{AddressParser.ToAddress(rowFirst, columnFirst)}:{AddressParser.ToAddress(rowLast, columnLast)}";
+
+                if (columnFirst == columnLast && rowFirst == rowLast) {
+                    LocalAddress = AddressParser.ToAddress(rowFirst, columnFirst);
+                } else {
+                    LocalAddress =
+                        $"{AddressParser.ToAddress(rowFirst, columnFirst)}:{AddressParser.ToAddress(rowLast, columnLast)}";
+                }
+
+                RowFirst = rowFirst;
+                RowLast = rowLast;
+                ColumnFirst = columnFirst;
+                ColumnLast = columnLast;
+                Count = Rows * Columns;
             }
-            RowFirst = rowFirst;
-            RowLast = rowLast;
-            ColumnFirst = columnFirst;
-            ColumnLast = columnLast;
-            Count = Rows * Columns;
         }
 
         #region  public Properties
