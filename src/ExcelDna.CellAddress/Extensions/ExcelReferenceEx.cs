@@ -116,96 +116,6 @@ namespace ExcelDna.Extensions{
             XlCall.Excel(XlCall.xlcSelect, reference, Type.Missing);
         }
 
-/*
-        public static void Copy(this ExcelReference fromRange, ExcelReference toRange = null){
-            object to_range = (toRange == null) ? Type.Missing : toRange;
-            XlCall.Excel(XlCall.xlcCopy, fromRange, to_range);
-        }
-*/
-
-/*
-        public static ExcelReference Resize(this ExcelReference range, int rows, int cols){
-            rows = (rows < 1) ? 1 : rows;
-            cols = (cols < 1) ? 1 : cols;
-            return new ExcelReference(range.RowFirst, range.RowFirst + rows - 1, range.ColumnFirst,
-                range.ColumnFirst + cols - 1, range.SheetId);
-        }
-*/
-
-/*
-        /// <summary>
-        ///     从当前单元格计算偏移范围，返回和原始单元格相同大小的 ExcelReference 对象
-        /// </summary>
-        /// <param name="range"></param>
-        /// <param name="rows"></param>
-        /// <param name="cols"></param>
-        /// <returns></returns>
-        public static ExcelReference Offset(this ExcelReference range, int rows, int cols){
-            return new ExcelReference(range.RowFirst + rows, range.RowLast + rows, range.ColumnFirst + cols,
-                range.ColumnLast + cols, range.SheetId);
-        }
-*/
-
-/*
-        /// <summary>
-        ///     返回从当前单元格 左上角开始计算的 范围，根据给定的行列值，返回一个 rows*cols 大小的单元格区间
-        /// </summary>
-        /// <param name="range"></param>
-        /// <param name="rows"></param>
-        /// <param name="cols"></param>
-        /// <returns></returns>
-        public static ExcelReference Range(this ExcelReference range, int rows, int cols){
-            if (rows == 0){
-                rows = 1;
-            } else if (rows > 0){
-                rows--;
-            }
-            if (cols == 0){
-                cols = 1;
-            } else if (cols > 0){
-                cols--;
-            }
-            return new ExcelReference(range.RowFirst, range.RowFirst + rows, range.ColumnFirst,
-                range.ColumnFirst + cols, range.SheetId);
-        }
-*/
-
-/*
-        /// <summary>
-        ///     根据给定参考范围，返回给定单元格相关的地址范围
-        ///     如果 <see cref="address">单元格地址</see>包括工作簿，则使用地址的工作簿
-        ///     如果地址中没有指定工作簿，则使用 <see cref="refRange">参考单元格</see>的工作簿
-        /// </summary>
-        /// <param name="refRange"></param>
-        /// <param name="address"></param>
-        /// <returns></returns>
-        public static IEnumerable<ExcelReference> Range(this ExcelReference refRange, string address){
-            if (string.IsNullOrEmpty(address)){
-                yield return null;
-            } else{
-                if (address.StartsWith("=")){
-                    address = address.Substring(address.IndexOf('=') + 1);
-                }
-                string[] addressArray;
-                if (address.IndexOf(',') > 0){
-                    //多个单元格范围
-                    addressArray = address.Split(',');
-                } else{
-                    addressArray = new[]{address};
-                }
-                string refSheet = refRange.SheetNameLocal();
-                foreach (string item in addressArray){
-                    if (item.IndexOf('!') > 0){
-                        //包含工作簿定义
-                        yield return XlCall.Excel(XlCall.xlfEvaluate, item) as ExcelReference;
-                    } else{
-                        yield return
-                            XlCall.Excel(XlCall.xlfEvaluate, string.Format("{0}!{1}", refSheet, item)) as ExcelReference;
-                    }
-                }
-            }
-        }
-*/
 
         public static int CellsCount(this ExcelReference range) {
             return range.Rows()*range.Columns();
@@ -282,68 +192,6 @@ namespace ExcelDna.Extensions{
             }
             return string.IsNullOrEmpty(value.ToString());
         }
-
-/*
-        /// <summary>
-        ///     向单元格赋值,横向 单行，多列 [n,0]
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="range"></param>
-        /// <param name="values"></param>
-        public static void SetValues<T>(this ExcelReference range, IEnumerable<T> values){
-            if (range.CellsCount() > 1){
-                range.SetValue(values.ToArray());
-            } else{
-                T[] array = values.ToArray();
-                int count = array.Length;
-                var colRange = new ExcelReference(range.RowFirst, range.RowFirst,
-                    range.ColumnFirst, range.ColumnLast + count - 1
-                    );
-                colRange.SetValue(array);
-            }
-        }
-*/
-
-/*
-        /// <summary>
-        ///     向单元格赋值,横向 单行，多列 [n,0]
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="range"></param>
-        /// <param name="values"></param>
-        public static void SetValues<T>(this ExcelReference range, object[] values){
-            if (range.Columns() > 1){
-                range.SetValue(values.ToArray());
-            } else{
-                int count = values.Length;
-                var colRange = new ExcelReference(range.RowFirst, range.RowFirst,
-                    range.ColumnFirst, range.ColumnLast + count - 1
-                    );
-                colRange.SetValue(values);
-            }
-        }
-*/
-
-/*
-        /// <summary>
-        ///     描述 <see cref="cell" /> 单元格是否包含在<see cref="range" /> 范围内
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="range">可能包含 cell 的单元格范围</param>
-        /// <returns></returns>
-        public static bool InRange(this ExcelReference cell, ExcelReference range){
-            if (range == null || cell == null){
-                return false;
-            }
-            if (range.SheetId != cell.SheetId){
-                return false;
-            }
-            return range.RowLast >= cell.RowLast
-                   && range.RowFirst <= cell.RowFirst
-                   && range.ColumnLast >= cell.ColumnLast
-                   && range.ColumnFirst <= cell.ColumnFirst;
-        }
-*/
 
         #region 基本属性
 
@@ -546,7 +394,7 @@ namespace ExcelDna.Extensions{
         public static bool HasWorksheet(this ExcelReference range, string sheetName){
             string workName = range.WorkbookName();
             try{
-                object result = XlCall.Excel(XlCall.xlfGetDocument, 76, string.Format("[{0}]{1}", workName, sheetName));
+                object result = XlCall.Excel(XlCall.xlfGetDocument, 76, $"[{workName}]{sheetName}");
                 return !result.IsNull();
             } catch (Exception){
                 return false;
