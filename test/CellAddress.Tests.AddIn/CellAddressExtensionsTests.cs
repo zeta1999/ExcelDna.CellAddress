@@ -32,22 +32,22 @@ namespace CellAddressTests.AddIn {
         public void TestGetCellWithIndex() {
             var cells = CellAddress.Parse("A1:F5");
             var cell = cells.GetCell(1,XlFillDirection.ColumnFirst);
-            Assert.AreEqual("A2", cell.LocalAddress);
+            Assert.AreEqual("$B$1", cell.LocalAddress);
 
             var cell1 = cells.GetCell(2, XlFillDirection.RowFirst);
-            Assert.AreEqual("C1",cell1.LocalAddress);
+            Assert.AreEqual("$A$3", cell1.LocalAddress);
         }
 
         [TestMethod]
         public void TestOffset() {
             var cell = CellAddress.Parse("C4");
-            Assert.AreEqual("C5", cell.Offset(1).LocalAddress);
+            Assert.AreEqual("$C$5", cell.Offset(1).LocalAddress);
 
-            Assert.AreEqual("D4", cell.Offset(0,1).LocalAddress);
+            Assert.AreEqual("$D$4", cell.Offset(0,1).LocalAddress);
 
-            Assert.AreEqual("D5", cell.Offset(1, 1).LocalAddress);
+            Assert.AreEqual("$D$5", cell.Offset(1, 1).LocalAddress);
 
-            Assert.AreEqual("A3", cell.Offset(-1, -2).LocalAddress);
+            Assert.AreEqual("$A$3", cell.Offset(-1, -2).LocalAddress);
 
             Assert.ThrowsException<IndexOutOfRangeException>(() => { cell.Offset(-10); });
         }
@@ -85,7 +85,7 @@ namespace CellAddressTests.AddIn {
             var cells = new CellAddress[] {
                 "A1", "B2", "D5", "F3"
             };
-            Assert.AreEqual("A1:F5", cells.GetRange().LocalAddress);
+            Assert.AreEqual("$A$1:$F$5", cells.GetRange().LocalAddress);
         }
 
         [TestMethod]
@@ -96,10 +96,10 @@ namespace CellAddressTests.AddIn {
             Assert.AreEqual(0, cell.RowFirst);
 
             var nextCol = cell.GetCell(1, XlFillDirection.RowFirst);
-            Assert.AreEqual("A2",nextCol.LocalAddress);
+            Assert.AreEqual("$A$2", nextCol.LocalAddress);
 
             var nextRow = cell.GetCell(1, XlFillDirection.ColumnFirst);
-            Assert.AreEqual("B1",nextRow.LocalAddress);
+            Assert.AreEqual("$B$1", nextRow.LocalAddress);
         }
 
         [TestMethod]
@@ -108,10 +108,10 @@ namespace CellAddressTests.AddIn {
             Assert.AreEqual(4, cell.Count);
 
             var nextCol = cell.NextCell(1, XlFillDirection.RowFirst);
-            Assert.AreEqual("A2", nextCol.LocalAddress);
+            Assert.AreEqual("$A$2", nextCol.LocalAddress);
 
             var nextRow = cell.NextCell(1, XlFillDirection.ColumnFirst);
-            Assert.AreEqual("B1", nextRow.LocalAddress);
+            Assert.AreEqual("$B$1", nextRow.LocalAddress);
         }
 
         [TestMethod]
