@@ -4,7 +4,7 @@
     <TargetFrameworks>net40;net451</TargetFrameworks>
     <AssemblyName>ExcelDna.CellAddress</AssemblyName>
     <RootNamespace>ExcelDna</RootNamespace>
-    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <Company>Lingya Tech CO.</Company>
     <Authors>zwq00000@hotmail.com</Authors>
     <Description>ExcelDna Cell Address Extensions,support Range and ExcelReference   formats.</Description>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExcelDna.Integration" Version="0.34.6" />
+    <PackageReference Include="ExcelDna.Integration" Version="1.0.0" />
     <PackageReference Include="Microsoft.Office.Interop.Excel" Version="12.0.4518.1014" />
   </ItemGroup>
 
