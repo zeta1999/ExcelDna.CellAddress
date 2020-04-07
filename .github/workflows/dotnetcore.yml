@@ -22,15 +22,8 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
-  
-  publish:
-    runs-on: [windows-latest]
-    
-    name: publis to nuget
-    steps:
-      - uses: rohith/publish-nuget@2.2.1
-        with:
-          PROJECT_FILE_PATH: ./
-          NUGET_KEY: oy2o6zaf42azwqfoi5taqkrlqemltbhuxnwv5aitnlr67y
-            
+    - name: Pack
+      run: dotnet pack -c Release -o  ./output
+    - name: publish
+      run: dotnet nuget push ./output/*.nupkg -k  ${{ secrets.nuget_apikey }} 
     
