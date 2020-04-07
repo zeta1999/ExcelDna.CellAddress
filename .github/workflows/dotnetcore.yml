@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on:[windows]
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -25,7 +23,7 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
   
   publish:
-    runs-on: [ubuntu-latest]
+    runs-on: [windows]
     name: publis to nuget
     steps:
       - uses: rohith/publish-nuget@2.2.1
